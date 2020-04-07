@@ -61,15 +61,17 @@
 
 
 
-      var msg = document.getElementById('msg');
+     
       var map = L.map('map', {closePopupOnClick: false}).fitWorld();
-      let marker = null
+      var msg = document.getElementById('msg');
+      var bounds = map.getBounds();
+      let marker = null;
+      let circle = null;
       map.setZoom(16);
       new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         tileSize: 512,
-        zoomOffset: -1
+        zoomOffset: -1,
        
       }).addTo(map);
 
@@ -84,17 +86,12 @@
           msg.innerHTML += 'GPS tracking detected a position change : ' + latlngG + '<br/>';
           map.setView(latlngG);
 
-          
+          var northWest = bounds.getNorthWest(),
+              northEast = bounds.getNorthEast(),
+              southWest = bounds.getSouthWest(),
+              southEast = bounds.getSouthEast();
 
-          L.circle(latlngG, 200).addTo(map);
           
-
-  
-          
-        
-        //  marker =  L.marker(latlngG).addTo(map)
-        //   .bindPopup('You are here ' + latlngG + '<br/>')
-        //   .openPopup();
 
           
           geocodeService.reverse().latlng(latlngG).run(function (error, result) {
@@ -104,7 +101,16 @@
             marker  = L.marker(result.latlng).addTo(map)
              .bindPopup(result.address.Match_addr).openPopup();
 
-          });
+             if(circle !== null){
+               map.removeLayer(circle)
+             }
+             circle = L.circle(result.latlng, {radius: 200, stroke: true, color: '#F0E68C', fill: true, fillColor: '#F0E68C', fillOpacity: 0.5}).addTo(map);
+            
+             msg.innerHTML += `${southEast.latlngG}`;
+            });
+          
+
+          
           
         },
         errorCallback: error => {
