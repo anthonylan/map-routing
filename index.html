@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>demo - leaflet-gps-tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
@@ -26,10 +28,15 @@
 
    
     <style>
-      html, body {
-        width: 100%;
-        height: 100%;
-      }
+   
+      body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+            width: 100vw;
+        }
       .leaflet-container {
         width: 100%;
         height: 100vh;
@@ -55,12 +62,14 @@
 
 
       var msg = document.getElementById('msg');
-      var map = L.map('map');
+      var map = L.map('map', {closePopupOnClick: false}).fitWorld();
       let marker = null
       map.setZoom(16);
       new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        minZoom: 5,
-        maxZoom: 20,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        tileSize: 512,
+        zoomOffset: -1
        
       }).addTo(map);
 
@@ -75,9 +84,12 @@
           msg.innerHTML += 'GPS tracking detected a position change : ' + latlngG + '<br/>';
           map.setView(latlngG);
 
-          if(marker !== null){
-            map.removeLayer(marker);
-          }
+          
+
+          L.circle(latlngG, 200).addTo(map);
+          
+
+  
           
         
         //  marker =  L.marker(latlngG).addTo(map)
@@ -86,12 +98,12 @@
 
           
           geocodeService.reverse().latlng(latlngG).run(function (error, result) {
-            if (error) {
-              return;
-            }
+              if(marker !== null){
+                map.removeLayer(marker);
+              }
+            marker  = L.marker(result.latlng).addTo(map)
+             .bindPopup(result.address.Match_addr).openPopup();
 
-           marker  = L.marker(result.latlng).addTo(map).bindPopup(result.address.Match_addr).openPopup();
-  
           });
           
         },
