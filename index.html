@@ -10,6 +10,9 @@
 
     <!-- <link rel="stylesheet" href="./gps-control.css" /> -->
     <script src="./GPSControl.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <style>
       html, body {
         width: 100%;
@@ -47,6 +50,7 @@
 
       new GPSControl({
         track: true,
+        accuracy: true,
         activeCallback: active => {
           msg.innerHTML += 'GPS tracking is active ? ' + active + '<br/>';
         },
@@ -62,10 +66,13 @@
          marker =  L.marker(latlng).addTo(map)
           .bindPopup('You are here ' + latlng + '<br/>')
           .openPopup();
+          
         },
         errorCallback: error => {
           msg.innerHTML += 'GPS tracking failed : ' + error.message + '<br/>';
         }
+
+        
       }).addTo(map);
 
 
