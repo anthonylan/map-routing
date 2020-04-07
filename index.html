@@ -7,12 +7,24 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-    <!-- <link rel="stylesheet" href="./gps-control.css" /> -->
     <script src="./GPSControl.js"></script>
+  
+     <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.3.3/dist/esri-leaflet.js"
+  integrity="sha512-cMQ5e58BDuu1pr9BQ/eGRn6HaR6Olh0ofcHFWe5XesdCITVuSBiBZZbhCijBe5ya238f/zMMRYIMIIg1jxv4sQ=="
+  crossorigin=""></script>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+  <!-- Load Esri Leaflet Geocoder from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.2/dist/esri-leaflet-geocoder.css"
+    integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g=="
+    crossorigin="">
+  <script src="https://unpkg.com/esri-leaflet-geocoder@2.3.2/dist/esri-leaflet-geocoder.js"
+    integrity="sha512-8twnXcrOGP3WfMvjB0jS5pNigFuIWj4ALwWEgxhZ+mxvjF5/FBPVd5uAxqT8dd2kUmTVK9+yQJ4CmTmSg/sXAQ=="
+    crossorigin=""></script>
+
+
+   
     <style>
       html, body {
         width: 100%;
@@ -20,7 +32,7 @@
       }
       .leaflet-container {
         width: 100%;
-        height: 200px;
+        height: 100vh;
       }
     </style>
   </head>
@@ -32,12 +44,16 @@
     <div id="map"></div>
     <div id="msg"></div>
 
-    <h2>Only location, no active tracking</h2>
-
-    <div id="map2"></div>
-    <div id="msg2"></div>
+ 
 
     <script>
+
+
+
+    var geocodeService = L.esri.Geocoding.geocodeService();
+
+
+
       var msg = document.getElementById('msg');
       var map = L.map('map');
       let marker = null
@@ -51,21 +67,32 @@
       new GPSControl({
         track: true,
         accuracy: true,
+        autoCenter: false,
         activeCallback: active => {
           msg.innerHTML += 'GPS tracking is active ? ' + active + '<br/>';
         },
-        successCallback: latlng => {
-          msg.innerHTML += 'GPS tracking detected a position change : ' + latlng + '<br/>';
-          map.setView(latlng);
+        successCallback: latlngG => {
+          msg.innerHTML += 'GPS tracking detected a position change : ' + latlngG + '<br/>';
+          map.setView(latlngG);
 
           if(marker !== null){
             map.removeLayer(marker);
           }
           
         
-         marker =  L.marker(latlng).addTo(map)
-          .bindPopup('You are here ' + latlng + '<br/>')
-          .openPopup();
+        //  marker =  L.marker(latlngG).addTo(map)
+        //   .bindPopup('You are here ' + latlngG + '<br/>')
+        //   .openPopup();
+
+          
+          geocodeService.reverse().latlng(latlngG).run(function (error, result) {
+            if (error) {
+              return;
+            }
+
+           marker  = L.marker(result.latlng).addTo(map).bindPopup(result.address.Match_addr).openPopup();
+  
+          });
           
         },
         errorCallback: error => {
@@ -77,31 +104,10 @@
 
 
 
-      //@ Map II
 
-      var msg2 = document.getElementById('msg2');
-      var map2 = L.map('map2');
-      map2.setZoom(16);
-      map2.setView([47, 3]);
-      new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        minZoom: 5,
-        maxZoom: 20,
-      }).addTo(map2);
-
-      var gpsControl = new GPSControl({
-        track: false,
-        active: false,
-        successCallback: latlng => {
-          msg2.innerHTML += 'GPS locating : ' + latlng + '<br/>';
-          map2.setView(latlng);
-        },
-        errorCallback: error => {
-          msg2.innerHTML += 'GPS locating failed : ' + error.message + '<br/>';
-        }
-      }).addTo(map2);
-      gpsControl.updateActive(true);
     </script>
 
   
+
   </body>
 </html>
