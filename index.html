@@ -52,10 +52,6 @@
     </style>
   </head>
   <body>
-    <h1>demo - leaflet-gps-tracker</h1>
-
-    <h2>Full location and tracking functionality</h2>
-
     <div id="map"></div>
     <div id="msg"></div>
 
@@ -114,10 +110,10 @@
              }
              circle = L.circle(result.latlng, {radius: 200, stroke: true, color: '#F0E68C', fill: true, fillColor: '#F0E68C', fillOpacity: 0.5}).addTo(map);
             
-             msg.innerHTML += `${southEast.latlngG} <br>`;
-             msg.innerHTML += `${southWest.latlngG} <br>`;
-             msg.innerHTML += `${northEast.latlngG}<br>`;
-             msg.innerHTML += `${northWest.latlngG}<br>`;
+             msg.innerHTML += `${southEast} <br>`;
+             msg.innerHTML += `${southWest} <br>`;
+             msg.innerHTML += `${northEast}<br>`;
+             msg.innerHTML += `${northWest}<br>`;
             });
           
 
